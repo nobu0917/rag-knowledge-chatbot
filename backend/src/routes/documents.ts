@@ -1,13 +1,58 @@
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import { Router } from 'express';
+import type { DocsResponse } from '../../../shared/types';
 import { chunkMarkdown } from '../lib/chunker';
 import { embedDocument, isRateLimitError, EMBEDDING_DIMENSIONS } from '../lib/gemini';
-import { addDocument, hasDoc, type StoredChunk } from '../lib/vectorStore';
+import {
+  addDocument,
+  hasDoc,
+  listDocNames,
+  removeDocument,
+  type StoredChunk,
+} from '../lib/vectorStore';
 
 const ALLOWED_EXT = ['.md', '.txt'];
 const MAX_CONTENT_CHARS = 100_000;
 const MAX_CHUNKS = 60;
 
+const DOCS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '../../docs');
+
+/**
+ * 同梱のサンプル規程かどうか。backend/docs/ に原本ファイルが存在する文書は
+ * `npm run ingest` の生成元＝デモの土台なので、画面からの削除対象にしない。
+ */
+function isSeedDoc(docName: string): boolean {
+  // パス区切りを含む名前はディレクトリトラバーサル防止のため常に不正扱い
+  if (docName.includes('/') || docName.includes('\\') || docName.includes('..')) return true;
+  return existsSync(path.join(DOCS_DIR, docName));
+}
+
 export const documentsRouter = Router();
+
+/** 読み込み済みドキュメント一覧（削除可否フラグ付き） */
+documentsRouter.get('/docs', (_req, res) => {
+  const body: DocsResponse = {
+    docs: listDocNames().map((name) => ({ name, deletable: !isSeedDoc(name) })),
+  };
+  res.json(body);
+});
+
+/** アップロードされた文書の削除（同梱のサンプル規程は保護） */
+documentsRouter.delete('/documents/:docName', (req, res) => {
+  const docName = req.params.docName;
+  if (!hasDoc(docName)) {
+    res.status(404).json({ error: 'not_found' });
+    return;
+  }
+  if (isSeedDoc(docName)) {
+    res.status(403).json({ error: 'protected' });
+    return;
+  }
+  const removedChunks = removeDocument(docName);
+  res.json({ docName, removedChunks });
+});
 
 /**
  * 文書アップロード。受け取ったテキストをその場でチャンク分割・埋め込みし、

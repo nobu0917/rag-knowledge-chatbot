@@ -1,4 +1,4 @@
-import type { Answer } from '../../../shared/types';
+import type { Answer, DocInfo } from '../../../shared/types';
 
 /**
  * HTTPステータス付きのAPIエラー（429=レート制限 などをUI側で出し分ける）。
@@ -35,11 +35,24 @@ export async function getAnswer(question: string): Promise<Answer> {
 }
 
 /** 読み込み済みドキュメント一覧を取得する */
-export async function getDocs(): Promise<string[]> {
+export async function getDocs(): Promise<DocInfo[]> {
   const res = await fetch('/api/docs');
   if (!res.ok) throw new ApiError(res.status);
-  const body: { docs: string[] } = await res.json();
+  const body: { docs: DocInfo[] } = await res.json();
   return body.docs;
+}
+
+/** アップロードした文書を削除する（同梱のサンプル規程は削除不可） */
+export async function deleteDocument(docName: string): Promise<void> {
+  const res = await fetch(`/api/documents/${encodeURIComponent(docName)}`, {
+    method: 'DELETE',
+  }).catch(() => {
+    throw new ApiError(0);
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new ApiError(body === null ? 0 : res.status, body?.error);
+  }
 }
 
 export type UploadResult = { docName: string; chunks: number };

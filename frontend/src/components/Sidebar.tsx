@@ -1,9 +1,11 @@
 import { useRef } from 'react';
+import type { DocInfo } from '../../../shared/types';
 
 type Props = {
-  docs: string[];
+  docs: DocInfo[];
   uploading: boolean;
   onUpload: (file: File) => void;
+  onDelete: (docName: string) => void;
 };
 
 function docIcon(name: string): string {
@@ -14,7 +16,7 @@ function docIcon(name: string): string {
   return '📄';
 }
 
-export function Sidebar({ docs, uploading, onUpload }: Props) {
+export function Sidebar({ docs, uploading, onUpload, onDelete }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,10 +31,21 @@ export function Sidebar({ docs, uploading, onUpload }: Props) {
       <h2 className="sidebar-title">読み込み済みドキュメント</h2>
       <ul className="doc-list">
         {docs.length === 0 && <li className="doc-empty">サーバーに接続できません</li>}
-        {docs.map((name) => (
-          <li key={name} className="doc-item" title={name}>
-            <span className="doc-icon">{docIcon(name)}</span>
-            <span className="doc-name">{name}</span>
+        {docs.map((doc) => (
+          <li key={doc.name} className="doc-item" title={doc.name}>
+            <span className="doc-icon">{docIcon(doc.name)}</span>
+            <span className="doc-name">{doc.name}</span>
+            {doc.deletable && (
+              <button
+                className="doc-delete-button"
+                title={`「${doc.name}」を削除`}
+                aria-label={`「${doc.name}」を削除`}
+                onClick={() => onDelete(doc.name)}
+                disabled={uploading}
+              >
+                🗑
+              </button>
+            )}
           </li>
         ))}
       </ul>

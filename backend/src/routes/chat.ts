@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import type { Answer, ChatRequest, DocsResponse } from '../../../shared/types';
+import type { Answer, ChatRequest } from '../../../shared/types';
 import { embedQuery, generateAnswer, isRateLimitError } from '../lib/gemini';
-import { searchSimilar, listDocNames } from '../lib/vectorStore';
+import { searchSimilar } from '../lib/vectorStore';
 
 const TOP_K = 4;
 /**
@@ -16,11 +16,6 @@ const NOT_FOUND_TEXT =
   'ご質問に関連する記載は、読み込み済みのドキュメントからは見つかりませんでした。お手数ですが、質問の表現を変えるか、担当部署へ直接お問い合わせください。';
 
 export const chatRouter = Router();
-
-chatRouter.get('/docs', (_req, res) => {
-  const body: DocsResponse = { docs: listDocNames() };
-  res.json(body);
-});
 
 chatRouter.post('/chat', async (req, res) => {
   const { question } = (req.body ?? {}) as Partial<ChatRequest>;

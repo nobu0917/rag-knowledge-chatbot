@@ -66,6 +66,20 @@ export function addDocument(chunks: StoredChunk[]): void {
   writeFileSync(STORE_PATH, JSON.stringify(store));
 }
 
+/**
+ * 指定文書のチャンクをすべて削除してJSONへ永続化し、削除したチャンク数を返す。
+ */
+export function removeDocument(docName: string): number {
+  const store = loadStore();
+  const before = store.chunks.length;
+  store.chunks = store.chunks.filter((c) => c.docName !== docName);
+  const removed = before - store.chunks.length;
+  if (removed > 0) {
+    writeFileSync(STORE_PATH, JSON.stringify(store));
+  }
+  return removed;
+}
+
 function dot(a: number[], b: number[]): number {
   let sum = 0;
   for (let i = 0; i < a.length; i++) sum += a[i] * b[i];

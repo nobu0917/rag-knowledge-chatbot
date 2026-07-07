@@ -78,9 +78,37 @@ body {
 }
 
 .doc-name {
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.doc-delete-button {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 13px;
+  padding: 2px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+}
+
+.doc-item:hover .doc-delete-button,
+.doc-delete-button:focus-visible {
+  opacity: 1;
+}
+
+.doc-delete-button:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+.doc-delete-button:disabled {
+  cursor: not-allowed;
 }
 
 .doc-empty {

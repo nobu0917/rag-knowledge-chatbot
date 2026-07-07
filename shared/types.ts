@@ -22,7 +22,14 @@ export type ChatRequest = {
   question: string;
 };
 
+/** 読み込み済みドキュメント1件の情報 */
+export type DocInfo = {
+  name: string;
+  /** true=アップロードされた文書（削除可）。false=同梱のサンプル規程（保護対象） */
+  deletable: boolean;
+};
+
 /** GET /api/docs レスポンス */
 export type DocsResponse = {
-  docs: string[];
+  docs: DocInfo[];
 };

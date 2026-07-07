@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { getAnswer, getDocs, uploadDocument, ApiError } from './api/getAnswer';
+import { getAnswer, getDocs, uploadDocument, deleteDocument, ApiError } from './api/getAnswer';
 import { Sidebar } from './components/Sidebar';
 import { ChatMessageBubble } from './components/ChatMessageBubble';
 import type { ChatMessage } from './types';
+import type { DocInfo } from '../../shared/types';
 
 let nextId = 100;
 
@@ -41,7 +42,7 @@ function uploadErrorMessage(err: unknown): string {
 }
 
 export default function App() {
-  const [docs, setDocs] = useState<string[]>([]);
+  const [docs, setDocs] = useState<DocInfo[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 0,
@@ -118,9 +119,33 @@ export default function App() {
     }
   };
 
+  const handleDelete = async (docName: string) => {
+    if (uploading) return;
+    if (!window.confirm(`「${docName}」を削除しますか？\n削除すると、この文書は回答の根拠に使われなくなります。`)) {
+      return;
+    }
+    try {
+      await deleteDocument(docName);
+      const list = await getDocs();
+      setDocs(list);
+      setMessages((prev) => [
+        ...prev,
+        { id: nextId++, role: 'bot', text: `「${docName}」を削除しました。` },
+      ]);
+    } catch (err) {
+      const text =
+        err instanceof ApiError && err.code === 'protected'
+          ? 'この文書は同梱のサンプル規程のため削除できません。'
+          : err instanceof ApiError && err.status === 0
+            ? 'サーバーに接続できません。バックエンドが起動しているか確認してください。'
+            : '削除に失敗しました。時間をおいて再度お試しください。';
+      setMessages((prev) => [...prev, { id: nextId++, role: 'bot', text, isError: true }]);
+    }
+  };
+
   return (
     <div className="app">
-      <Sidebar docs={docs} uploading={uploading} onUpload={handleUpload} />
+      <Sidebar docs={docs} uploading={uploading} onUpload={handleUpload} onDelete={handleDelete} />
       <main className="chat-area">
         <header className="chat-header">
           <h1>社内ドキュメント アシスタント</h1>
