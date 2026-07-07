@@ -4,8 +4,11 @@ import { embedQuery, generateAnswer, isRateLimitError } from '../lib/gemini';
 import { searchSimilar, listDocNames } from '../lib/vectorStore';
 
 const TOP_K = 4;
-/** 検索スコアの足切り閾値。scripts/search.ts で実測して調整する */
-export const SCORE_THRESHOLD = 0.55;
+/**
+ * 検索スコアの足切り閾値。scripts/search.ts での実測に基づく:
+ * 関連質問のtop-1は0.70〜0.80、無関係質問のtop-1は0.52〜0.63だったため中間の0.65とした
+ */
+export const SCORE_THRESHOLD = 0.65;
 const MAX_QUESTION_CHARS = 500;
 const EXCERPT_CHARS = 200;
 
