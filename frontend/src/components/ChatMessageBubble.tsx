@@ -10,7 +10,9 @@ export function ChatMessageBubble({ message }: Props) {
   return (
     <div className={`message-row ${isUser ? 'message-row-user' : 'message-row-bot'}`}>
       {!isUser && <div className="avatar">🤖</div>}
-      <div className={`bubble ${isUser ? 'bubble-user' : 'bubble-bot'}`}>
+      <div
+        className={`bubble ${isUser ? 'bubble-user' : 'bubble-bot'}${message.isError ? ' bubble-error' : ''}`}
+      >
         <p className="bubble-text">{message.text}</p>
         {!isUser && message.sources && <SourceList sources={message.sources} />}
         {!isUser && message.sources && message.sources.length === 0 && (

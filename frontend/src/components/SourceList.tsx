@@ -39,7 +39,7 @@ export function SourceList({ sources }: Props) {
                 aria-expanded={isOpen}
               >
                 <span className="source-doc">📎 {source.docName}</span>
-                <span className="source-page">p.{source.page}</span>
+                <span className="source-page" title={source.section}>§{source.section}</span>
                 <span className="source-chevron">{isOpen ? '▲' : '▼'}</span>
               </button>
               {isOpen && (

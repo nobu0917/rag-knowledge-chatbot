@@ -1,27 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { getAnswer } from './api/getAnswer';
+import { getAnswer, getDocs, ApiError } from './api/getAnswer';
 import { Sidebar } from './components/Sidebar';
 import { ChatMessageBubble } from './components/ChatMessageBubble';
-import type { ChatMessage, DocFile } from './types';
-
-const INITIAL_DOCS: DocFile[] = [
-  { id: 1, name: '就業規則.pdf' },
-  { id: 2, name: '経費精算マニュアル.pdf' },
-  { id: 3, name: '情報セキュリティ規程.docx' },
-  { id: 4, name: '出張旅費規程.pdf' },
-];
-
-const DUMMY_ADD_NAMES = [
-  '育児介護休業規程.pdf',
-  '社用車管理規程.docx',
-  '福利厚生ガイド.pdf',
-  '安全衛生管理規程.docx',
-];
+import type { ChatMessage } from './types';
 
 let nextId = 100;
 
+function errorMessage(err: unknown): string {
+  if (err instanceof ApiError && err.status === 429) {
+    return 'アクセスが集中しています（無料枠のレート制限）。1分ほど待ってから、もう一度送信してください。';
+  }
+  if (err instanceof ApiError) {
+    return 'サーバーでエラーが発生しました。時間をおいて再度お試しください。';
+  }
+  return 'サーバーに接続できません。バックエンド（backend: npm run dev）が起動しているか確認してください。';
+}
+
 export default function App() {
-  const [docs, setDocs] = useState<DocFile[]>(INITIAL_DOCS);
+  const [docs, setDocs] = useState<string[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 0,
@@ -34,15 +30,14 @@ export default function App() {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    getDocs()
+      .then(setDocs)
+      .catch(() => setDocs([]));
+  }, []);
+
+  useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
-
-  const handleAddDoc = () => {
-    setDocs((prev) => {
-      const name = DUMMY_ADD_NAMES[prev.length % DUMMY_ADD_NAMES.length];
-      return [...prev, { id: nextId++, name }];
-    });
-  };
 
   const handleSend = async () => {
     const question = input.trim();
@@ -57,6 +52,11 @@ export default function App() {
         ...prev,
         { id: nextId++, role: 'bot', text: answer.text, sources: answer.sources },
       ]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        { id: nextId++, role: 'bot', text: errorMessage(err), isError: true },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -70,11 +70,11 @@ export default function App() {
 
   return (
     <div className="app">
-      <Sidebar docs={docs} onAddDoc={handleAddDoc} />
+      <Sidebar docs={docs} />
       <main className="chat-area">
         <header className="chat-header">
           <h1>社内ドキュメント アシスタント</h1>
-          <span className="proto-badge">プロトタイプ（回答はモック）</span>
+          <span className="proto-badge">Gemini + 自前ベクトル検索</span>
         </header>
 
         <div className="chat-log">

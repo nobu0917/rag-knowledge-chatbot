@@ -83,20 +83,10 @@ body {
   white-space: nowrap;
 }
 
-.add-doc-button {
-  margin-top: 14px;
-  padding: 10px;
-  border: 1px dashed #6b7280;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--sidebar-text);
-  font-size: 13.5px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.add-doc-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+.doc-empty {
+  padding: 9px 8px;
+  font-size: 12.5px;
+  color: #9ca3af;
 }
 
 /* ---------- チャット画面 ---------- */
@@ -191,6 +181,12 @@ body {
   white-space: pre-wrap;
 }
 
+.bubble-error {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
 .no-source-note {
   margin-top: 10px;
   font-size: 12px;
@@ -266,9 +262,13 @@ body {
 }
 
 .source-page {
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
   font-size: 12px;
   color: var(--text-sub);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .source-chevron {

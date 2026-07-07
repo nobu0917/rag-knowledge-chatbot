@@ -1,22 +1,12 @@
-export type Source = {
-  docName: string;
-  page: number;
-  excerpt: string;
-};
+import type { Source } from '../../shared/types';
 
-export type Answer = {
-  text: string;
-  sources: Source[];
-};
+export type { Source, Answer } from '../../shared/types';
 
 export type ChatMessage = {
   id: number;
   role: 'user' | 'bot';
   text: string;
   sources?: Source[];
-};
-
-export type DocFile = {
-  id: number;
-  name: string;
+  /** APIエラー由来のメッセージ（赤系スタイルで表示） */
+  isError?: boolean;
 };
