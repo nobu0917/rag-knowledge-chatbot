@@ -1,16 +1,19 @@
 import 'dotenv/config';
 import express from 'express';
 import { chatRouter } from './routes/chat';
+import { documentsRouter } from './routes/documents';
 import { loadStore } from './lib/vectorStore';
 
 const app = express();
-app.use(express.json());
+// アップロード文書の本文を受け取るため、JSONボディの上限を引き上げる
+app.use(express.json({ limit: '1mb' }));
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
 app.use('/api', chatRouter);
+app.use('/api', documentsRouter);
 
 const port = Number(process.env.PORT ?? 3100);
 

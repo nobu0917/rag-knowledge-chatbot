@@ -89,6 +89,34 @@ body {
   color: #9ca3af;
 }
 
+.add-doc-button {
+  margin-top: 14px;
+  padding: 10px;
+  border: 1px dashed #6b7280;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sidebar-text);
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.add-doc-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.add-doc-button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.add-doc-hint {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #9ca3af;
+  text-align: center;
+}
+
 /* ---------- チャット画面 ---------- */
 
 .chat-area {

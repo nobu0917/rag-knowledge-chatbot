@@ -5,7 +5,7 @@
  * ベクトルDBを導入せず、埋め込みをJSONファイルに永続化して起動時にメモリへ読む。
  * 全ベクトルはingest時にL2正規化済みなので、コサイン類似度は内積と一致する。
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -50,6 +50,20 @@ export function searchSimilar(queryVec: number[], k: number): ScoredChunk[] {
 
 export function listDocNames(): string[] {
   return [...new Set(loadStore().chunks.map((c) => c.docName))];
+}
+
+export function hasDoc(docName: string): boolean {
+  return loadStore().chunks.some((c) => c.docName === docName);
+}
+
+/**
+ * 文書1件分のチャンクをベクトルストアに追記し、JSONへ永続化する。
+ * メモリ上のキャッシュも更新するため、サーバー再起動なしで検索対象になる。
+ */
+export function addDocument(chunks: StoredChunk[]): void {
+  const store = loadStore();
+  store.chunks.push(...chunks);
+  writeFileSync(STORE_PATH, JSON.stringify(store));
 }
 
 function dot(a: number[], b: number[]): number {

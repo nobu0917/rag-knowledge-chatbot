@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { getAnswer, getDocs, ApiError } from './api/getAnswer';
+import { getAnswer, getDocs, uploadDocument, ApiError } from './api/getAnswer';
 import { Sidebar } from './components/Sidebar';
 import { ChatMessageBubble } from './components/ChatMessageBubble';
 import type { ChatMessage } from './types';
@@ -16,6 +16,30 @@ function errorMessage(err: unknown): string {
   return 'サーバーに接続できません。バックエンド（backend: npm run dev）が起動しているか確認してください。';
 }
 
+function uploadErrorMessage(err: unknown): string {
+  if (err instanceof ApiError) {
+    if (err.status === 0) {
+      return 'サーバーに接続できません。バックエンドが起動しているか確認してください。';
+    }
+    if (err.status === 429) {
+      return 'アクセスが集中しています（無料枠のレート制限）。1分ほど待ってから、もう一度お試しください。';
+    }
+    switch (err.code) {
+      case 'unsupported_type':
+        return '対応していない形式です。Markdown（.md）またはテキスト（.txt）を選んでください。';
+      case 'too_large':
+        return 'ファイルが大きすぎます。10万文字以内の文書にしてください。';
+      case 'too_many_chunks':
+        return '文書が長すぎます。分割してから読み込ませてください。';
+      case 'duplicate':
+        return '同じ名前の文書がすでに読み込まれています。';
+      case 'empty':
+        return '読み取れる本文がありませんでした。';
+    }
+  }
+  return '読み込みに失敗しました。時間をおいて再度お試しください。';
+}
+
 export default function App() {
   const [docs, setDocs] = useState<string[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -27,6 +51,7 @@ export default function App() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,9 +93,34 @@ export default function App() {
     }
   };
 
+  const handleUpload = async (file: File) => {
+    if (uploading) return;
+    setUploading(true);
+    try {
+      const { docName, chunks } = await uploadDocument(file);
+      const list = await getDocs();
+      setDocs(list);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: nextId++,
+          role: 'bot',
+          text: `「${docName}」を読み込みました（${chunks}件のセクションに分割）。この文書の内容について質問できます。`,
+        },
+      ]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        { id: nextId++, role: 'bot', text: uploadErrorMessage(err), isError: true },
+      ]);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="app">
-      <Sidebar docs={docs} />
+      <Sidebar docs={docs} uploading={uploading} onUpload={handleUpload} />
       <main className="chat-area">
         <header className="chat-header">
           <h1>社内ドキュメント アシスタント</h1>
