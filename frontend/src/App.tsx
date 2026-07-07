@@ -10,7 +10,7 @@ function errorMessage(err: unknown): string {
   if (err instanceof ApiError && err.status === 429) {
     return 'アクセスが集中しています（無料枠のレート制限）。1分ほど待ってから、もう一度送信してください。';
   }
-  if (err instanceof ApiError) {
+  if (err instanceof ApiError && err.status !== 0) {
     return 'サーバーでエラーが発生しました。時間をおいて再度お試しください。';
   }
   return 'サーバーに接続できません。バックエンド（backend: npm run dev）が起動しているか確認してください。';

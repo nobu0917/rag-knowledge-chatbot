@@ -1,6 +1,9 @@
 import type { Answer } from '../../../shared/types';
 
-/** HTTPステータス付きのAPIエラー（429=レート制限 などをUI側で出し分ける） */
+/**
+ * HTTPステータス付きのAPIエラー（429=レート制限 などをUI側で出し分ける）。
+ * status=0 はバックエンドに到達できなかったことを表す（未起動・ネットワーク断など）。
+ */
 export class ApiError extends Error {
   constructor(public status: number) {
     super(`API error: ${status}`);
@@ -16,8 +19,14 @@ export async function getAnswer(question: string): Promise<Answer> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ question }),
+  }).catch(() => {
+    throw new ApiError(0);
   });
-  if (!res.ok) throw new ApiError(res.status);
+  if (!res.ok) {
+    // バックエンド未起動時はViteのproxyが非JSONの500を返すため、JSONかどうかで接続不能と区別する
+    const body = await res.json().catch(() => null);
+    throw new ApiError(body === null ? 0 : res.status);
+  }
   return res.json();
 }
 
