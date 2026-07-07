@@ -1,0 +1,377 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #f5f6f8;
+  --sidebar-bg: #1f2937;
+  --sidebar-text: #e5e7eb;
+  --accent: #2563eb;
+  --accent-soft: #eff6ff;
+  --border: #d9dde3;
+  --text: #1f2933;
+  --text-sub: #6b7280;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Meiryo', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* ---------- サイドバー ---------- */
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 14px;
+}
+
+.sidebar-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  margin-bottom: 12px;
+  padding: 0 6px;
+}
+
+.doc-list {
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.doc-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 8px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  cursor: default;
+}
+
+.doc-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.doc-icon {
+  flex-shrink: 0;
+}
+
+.doc-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.add-doc-button {
+  margin-top: 14px;
+  padding: 10px;
+  border: 1px dashed #6b7280;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sidebar-text);
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.add-doc-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- チャット画面 ---------- */
+
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
+
+.chat-header h1 {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.proto-badge {
+  font-size: 11.5px;
+  color: var(--text-sub);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  background: var(--bg);
+}
+
+.chat-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.message-row {
+  display: flex;
+  gap: 10px;
+  max-width: 760px;
+}
+
+.message-row-user {
+  align-self: flex-end;
+  justify-content: flex-end;
+}
+
+.message-row-bot {
+  align-self: flex-start;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--border);
+  font-size: 17px;
+}
+
+.bubble {
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 14.5px;
+  line-height: 1.75;
+}
+
+.bubble-user {
+  background: var(--accent);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.bubble-bot {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+.bubble-text {
+  white-space: pre-wrap;
+}
+
+.no-source-note {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+/* ---------- 出典セクション ---------- */
+
+.source-section {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.source-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.source-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #166534;
+  background: #dcfce7;
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.source-count {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.source-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.source-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fafbfc;
+}
+
+.source-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+}
+
+.source-toggle:hover {
+  background: var(--accent-soft);
+}
+
+.source-doc {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-page {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.source-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--text-sub);
+}
+
+.source-excerpt {
+  margin: 0 12px 10px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  font-size: 13px;
+  line-height: 1.7;
+  color: #374151;
+  border-radius: 0 6px 6px 0;
+}
+
+/* ---------- ローディング ---------- */
+
+.bubble-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-sub);
+}
+
+.thinking-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.thinking-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: blink 1.2s infinite ease-in-out;
+}
+
+.thinking-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.thinking-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+/* ---------- 入力欄 ---------- */
+
+.input-bar {
+  display: flex;
+  gap: 10px;
+  padding: 14px 24px;
+  background: #fff;
+  border-top: 1px solid var(--border);
+}
+
+.question-input {
+  flex: 1;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14.5px;
+  font-family: inherit;
+  outline: none;
+}
+
+.question-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.send-button {
+  padding: 0 26px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14.5px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.send-button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.send-button:disabled {
+  background: #9db4e8;
+  cursor: not-allowed;
+}

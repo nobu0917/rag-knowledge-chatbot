@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# environment variables (APIキーは絶対にコミットしない)
+.env
+.env.local
+*.local
+
+# editor / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# logs
+*.log
