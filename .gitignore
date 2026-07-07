@@ -3,6 +3,7 @@ node_modules/
 
 # build output
 dist/
+*.tsbuildinfo
 
 # environment variables (APIキーは絶対にコミットしない)
 .env
